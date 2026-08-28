@@ -10,10 +10,25 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Load cart from sessionStorage when the page loads
-let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+let cart = [];
 
-// Render product list
+// Load cart from sessionStorage
+function loadCart() {
+  const storedCart = window.sessionStorage.getItem("cart");
+
+  if (storedCart) {
+    cart = JSON.parse(storedCart);
+  } else {
+    cart = [];
+  }
+}
+
+// Save cart to sessionStorage
+function saveCart() {
+  window.sessionStorage.setItem("cart", JSON.stringify(cart));
+}
+
+// Render products
 function renderProducts() {
   productList.innerHTML = "";
 
@@ -31,7 +46,7 @@ function renderProducts() {
   });
 }
 
-// Render cart list
+// Render cart
 function renderCart() {
   cartList.innerHTML = "";
 
@@ -52,30 +67,23 @@ function renderCart() {
 // Add item to cart
 function addToCart(productId) {
   const product = products.find(
-    (product) => product.id === Number(productId)
+    (p) => p.id === Number(productId)
   );
 
   if (product) {
     cart.push(product);
-
-    sessionStorage.setItem("cart", JSON.stringify(cart));
-
+    saveCart();
     renderCart();
   }
 }
 
 // Remove item from cart
 function removeFromCart(productId) {
-  const index = cart.findIndex(
-    (product) => product.id === Number(productId)
+  cart = cart.filter(
+    (product) => product.id !== Number(productId)
   );
 
-  if (index !== -1) {
-    cart.splice(index, 1);
-  }
-
-  sessionStorage.setItem("cart", JSON.stringify(cart));
-
+  saveCart();
   renderCart();
 }
 
@@ -83,28 +91,25 @@ function removeFromCart(productId) {
 function clearCart() {
   cart = [];
 
-  sessionStorage.setItem("cart", JSON.stringify(cart));
-
+  saveCart();
   renderCart();
 }
 
-// Add to cart
+// Add to cart button
 productList.addEventListener("click", function (event) {
   if (event.target.classList.contains("add-to-cart-btn")) {
     addToCart(event.target.dataset.id);
   }
 });
 
-// Remove from cart
+// Remove from cart button
 cartList.addEventListener("click", function (event) {
   if (event.target.classList.contains("remove-from-cart-btn")) {
     removeFromCart(event.target.dataset.id);
   }
 });
 
-// Clear cart
-clearCartBtn.addEventListener("click", clearCart);
-
-// Initial render
+// IMPORTANT: Load storage BEFORE initial rendering
+loadCart();
 renderProducts();
 renderCart();
