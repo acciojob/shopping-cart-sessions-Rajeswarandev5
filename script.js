@@ -1,4 +1,3 @@
-// Product data
 const products = [
   { id: 1, name: "Product 1", price: 10 },
   { id: 2, name: "Product 2", price: 20 },
@@ -7,18 +6,17 @@ const products = [
   { id: 5, name: "Product 5", price: 50 },
 ];
 
-// DOM elements
 const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Get cart from sessionStorage
-function getCart() {
-  return JSON.parse(sessionStorage.getItem("cart")) || [];
-}
+// Load cart from sessionStorage when the page loads
+let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
 // Render product list
 function renderProducts() {
+  productList.innerHTML = "";
+
   products.forEach((product) => {
     const li = document.createElement("li");
 
@@ -37,8 +35,6 @@ function renderProducts() {
 function renderCart() {
   cartList.innerHTML = "";
 
-  const cart = getCart();
-
   cart.forEach((product) => {
     const li = document.createElement("li");
 
@@ -55,8 +51,6 @@ function renderCart() {
 
 // Add item to cart
 function addToCart(productId) {
-  const cart = getCart();
-
   const product = products.find(
     (product) => product.id === Number(productId)
   );
@@ -72,8 +66,6 @@ function addToCart(productId) {
 
 // Remove item from cart
 function removeFromCart(productId) {
-  let cart = getCart();
-
   const index = cart.findIndex(
     (product) => product.id === Number(productId)
   );
@@ -89,28 +81,28 @@ function removeFromCart(productId) {
 
 // Clear cart
 function clearCart() {
-  sessionStorage.setItem("cart", JSON.stringify([]));
+  cart = [];
+
+  sessionStorage.setItem("cart", JSON.stringify(cart));
 
   renderCart();
 }
 
-// Add to cart button
+// Add to cart
 productList.addEventListener("click", function (event) {
   if (event.target.classList.contains("add-to-cart-btn")) {
-    const productId = event.target.dataset.id;
-    addToCart(productId);
+    addToCart(event.target.dataset.id);
   }
 });
 
-// Remove from cart button
+// Remove from cart
 cartList.addEventListener("click", function (event) {
   if (event.target.classList.contains("remove-from-cart-btn")) {
-    const productId = event.target.dataset.id;
-    removeFromCart(productId);
+    removeFromCart(event.target.dataset.id);
   }
 });
 
-// Clear cart button
+// Clear cart
 clearCartBtn.addEventListener("click", clearCart);
 
 // Initial render
